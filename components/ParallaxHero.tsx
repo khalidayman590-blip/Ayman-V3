@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AppConfig } from '../types';
 import { ArrowDown } from 'lucide-react';
 
@@ -12,36 +12,41 @@ const TOTAL_FRAMES = 192;
 const ParallaxHero: React.FC<Props> = ({ config }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [loadingProgress, setLoadingProgress] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  
+  // Use a ref to store images so we don't trigger re-renders on every load
+  const imagesRef = useRef<HTMLImageElement[]>([]);
 
   // Preload images logic
-  const images = useMemo(() => {
-    const imgs: HTMLImageElement[] = [];
-    setLoadingProgress(0);
-    setImagesLoaded(false);
-    
-    if (typeof window !== 'undefined') {
-      for (let i = 0; i < TOTAL_FRAMES; i++) {
-        const img = new Image();
-        // Construct URL: frame_000_delay-0.04s.png
-        // Using config.sequenceUrl
-        const frameNum = i.toString().padStart(3, '0');
-        img.src = `${config.sequenceUrl}frame_${frameNum}_delay-0.04s.png`;
-        imgs.push(img);
-        img.onload = () => {
-          setLoadingProgress((prev) => prev + 1);
-        };
-      }
-    }
-    return imgs;
-  }, [config.sequenceUrl]);
-
   useEffect(() => {
-    if (loadingProgress >= TOTAL_FRAMES * 0.5) { // Show when 50% loaded for perceived speed
-      setImagesLoaded(true);
+    // Reset state when sequence URL changes
+    setImagesLoaded(false);
+    imagesRef.current = [];
+    
+    if (typeof window === 'undefined') return;
+
+    const imgs: HTMLImageElement[] = [];
+    let loadedCount = 0;
+    const threshold = Math.floor(TOTAL_FRAMES * 0.5); // 50% threshold
+
+    for (let i = 0; i < TOTAL_FRAMES; i++) {
+      const img = new Image();
+      // Construct URL: frame_000_delay-0.04s.png
+      const frameNum = i.toString().padStart(3, '0');
+      img.src = `${config.sequenceUrl}frame_${frameNum}_delay-0.04s.png`;
+      
+      img.onload = () => {
+        loadedCount++;
+        // Only update state once when we hit the threshold to avoid 100s of re-renders
+        if (loadedCount === threshold) {
+          setImagesLoaded(true);
+        }
+      };
+      imgs.push(img);
     }
-  }, [loadingProgress]);
+    
+    imagesRef.current = imgs;
+  }, [config.sequenceUrl]);
 
   // Scroll and Draw Logic
   useEffect(() => {
@@ -66,7 +71,7 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
         Math.floor(progress * (TOTAL_FRAMES - 1))
       );
 
-      const img = images[frameIndex];
+      const img = imagesRef.current[frameIndex];
 
       if (img && img.complete) {
         // Draw image covering the canvas (object-fit: cover equivalent)
@@ -95,14 +100,15 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
     window.addEventListener('resize', handleScroll);
     
     // Initial draw
-    const timer = setTimeout(handleScroll, 100);
+    if (imagesLoaded) {
+      handleScroll();
+    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
-      clearTimeout(timer);
     };
-  }, [images, imagesLoaded]);
+  }, [imagesLoaded]); // Re-bind/Re-run when loaded state changes
 
   // Handle Canvas Resize
   useEffect(() => {
