@@ -27,15 +27,18 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
 
     const imgs: HTMLImageElement[] = [];
     let loadedCount = 0;
-    const threshold = Math.floor(TOTAL_FRAMES * 0.5); // 50% threshold
+    
+    // Lower threshold to get users to content faster (approx 10% of frames)
+    // The rest will load in background while user reads the hero text
+    const threshold = 20; 
 
-    // Safety timeout: If images fail to load or are blocked, show content after 3s
+    // Safety timeout: Ensure we show content even if network is slow
     const safetyTimeout = setTimeout(() => {
         if (!imagesLoaded) {
             console.warn("Image sequence loading timed out or incomplete. Showing content.");
             setImagesLoaded(true);
         }
-    }, 3000);
+    }, 2000); // 2 seconds max wait
 
     for (let i = 0; i < TOTAL_FRAMES; i++) {
       const img = new Image();
@@ -45,14 +48,16 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
       
       img.onload = () => {
         loadedCount++;
-        // Only update state once when we hit the threshold to avoid 100s of re-renders
+        // Only update state once when we hit the threshold
         if (loadedCount === threshold) {
           setImagesLoaded(true);
         }
       };
       
-      // Handle errors gracefully so one bad frame doesn't break logic
+      // Handle errors gracefully
       img.onerror = () => {
+          // If essential frames fail, we still want to count towards "attempted" so we don't block forever
+          // But practically the timeout handles the "stuck" case.
           console.warn(`Failed to load frame ${frameNum}`);
       };
 
