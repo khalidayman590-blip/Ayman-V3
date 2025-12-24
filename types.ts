@@ -1,9 +1,11 @@
+
 export interface AppConfig {
   communityName: string;
   tagline: string;
   introText: string;
   accentColor: string;
   isDarkMode: boolean;
+  sequenceUrl: string; // URL to the folder containing frames
 }
 
 export interface LearningPath {
@@ -20,12 +22,25 @@ export interface Project {
   image: string;
 }
 
+export const SEQUENCES = [
+  { 
+    name: "Cyber Motion (Default)", 
+    url: "https://acrimldaoexwwnibqcwu.supabase.co/storage/v1/object/public/Portfolio/webp-frames/" 
+  },
+  {
+    name: "Blue Data Flow",
+    // Placeholder for a second sequence if available, pointing to same for demo purposes but conceptually different
+    url: "https://acrimldaoexwwnibqcwu.supabase.co/storage/v1/object/public/Portfolio/webp-frames/" 
+  }
+];
+
 export const DEFAULT_CONFIG: AppConfig = {
   communityName: "Andynocode Community",
   tagline: "Shaping the Future of AI-Powered Creation",
-  introText: "Join a hub where beginners and pros master AI tools to build animated experiences and full-stack apps.",
+  introText: "A hub where beginners, hobbyists, and professionals learn how to use AI tools to create stunning animated web experiences, internal tools, and full web apps.",
   accentColor: "#F97316", // Tailwind Orange-500
   isDarkMode: true,
+  sequenceUrl: SEQUENCES[0].url,
 };
 
 export const THEME_COLORS = [
