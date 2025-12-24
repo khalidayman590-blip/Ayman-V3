@@ -29,6 +29,14 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
     let loadedCount = 0;
     const threshold = Math.floor(TOTAL_FRAMES * 0.5); // 50% threshold
 
+    // Safety timeout: If images fail to load or are blocked, show content after 3s
+    const safetyTimeout = setTimeout(() => {
+        if (!imagesLoaded) {
+            console.warn("Image sequence loading timed out or incomplete. Showing content.");
+            setImagesLoaded(true);
+        }
+    }, 3000);
+
     for (let i = 0; i < TOTAL_FRAMES; i++) {
       const img = new Image();
       // Construct URL: frame_000_delay-0.04s.png
@@ -42,10 +50,18 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
           setImagesLoaded(true);
         }
       };
+      
+      // Handle errors gracefully so one bad frame doesn't break logic
+      img.onerror = () => {
+          console.warn(`Failed to load frame ${frameNum}`);
+      };
+
       imgs.push(img);
     }
     
     imagesRef.current = imgs;
+
+    return () => clearTimeout(safetyTimeout);
   }, [config.sequenceUrl]);
 
   // Scroll and Draw Logic
@@ -73,7 +89,8 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
 
       const img = imagesRef.current[frameIndex];
 
-      if (img && img.complete) {
+      // Ensure image is valid before drawing
+      if (img && img.complete && img.naturalWidth > 0) {
         // Draw image covering the canvas (object-fit: cover equivalent)
         const canvasRatio = canvas.width / canvas.height;
         const imgRatio = img.width / img.height;
@@ -108,7 +125,7 @@ const ParallaxHero: React.FC<Props> = ({ config }) => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
     };
-  }, [imagesLoaded]); // Re-bind/Re-run when loaded state changes
+  }, [imagesLoaded]); 
 
   // Handle Canvas Resize
   useEffect(() => {
