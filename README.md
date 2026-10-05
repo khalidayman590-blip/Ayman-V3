@@ -1,20 +1,38 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# ديوان المجالي — شعر نبطي كركي
 
-# Run and deploy your AI Studio app
+ديوان رقمي لتوثيق القصائد النبطية بلسان أهل الكَرَك: فهرس بحث، عرض القصيدة شطرين، فحص قافية ووزن،
+تصدير واستيراد، وطباعة.
 
-This contains everything you need to run your app locally.
+## التشغيل محلياً
 
-View your app in AI Studio: https://ai.studio/apps/drive/1CNRCFmopBOMaSmWrfRfE3a2Ekh-1Xbym
+**المتطلبات:** Node.js 18+
 
-## Run Locally
+```bash
+npm install
+npm run dev      # تشغيل التطوير
+npm run build    # بناء للإنتاج
+npm run preview  # معاينة البناء
+```
 
-**Prerequisites:**  Node.js
+## البنية
 
+| المسار | الوظيفة |
+| --- | --- |
+| `قصائد/*.md` | المصدر الأصلي للقصائد (ملف لكل قصيدة) |
+| `scripts/build-data.mjs` | يولّد `diwan/data.ts` من ملفات القصائد |
+| `diwan/types.ts` | الأنواع وقوائم البحور والضمائر |
+| `diwan/verify.ts` | فحص القافية والروي والضمير وطول الشطور |
+| `diwan/store.ts` | الحفظ في المتصفح + التصدير + الطباعة |
+| `components/` | واجهات: الواجهة، الفهرس، عرض القصيدة، القواعد، إضافة قصيدة |
+| `public/hero-karak.jpg` | خلفية الواجهة (قلعة الكرك) |
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+بعد تعديل أي ملف في مجلد `قصائد`:
+
+```bash
+node scripts/build-data.mjs
+```
+
+## قواعد النشر
+
+القواعد المثبّتة (قافية الصدر مختلفة عن العجز، عدم تكرار كلمات القافية، توحيد الضمير، منع الحشو،
+الحد الأدنى ٢٠ بيتاً) معروضة في صفحة «قواعد الديوان»، والفحص الآلي يمنع حفظ قصيدة فيها خطأ قافية.

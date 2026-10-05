@@ -1,21 +1,33 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
-    "./**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './App.tsx',
+    './index.tsx',
+    './components/**/*.{ts,tsx}',
+    './diwan/**/*.{ts,tsx}',
   ],
   darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Cairo', 'system-ui', 'sans-serif'],
+        shaer: ['Amiri', 'serif'],
       },
       colors: {
-        neutral: {
-          950: '#0a0a0a',
-        }
-      }
+        ليل: '#0a0805',
+        ليل٢: '#14100a',
+        ذهب: {
+          100: '#f7e3a1',
+          200: '#ecd08a',
+          300: '#dcb96a',
+          400: '#d3a94f',
+          500: '#c39a3d',
+          600: '#a47b28',
+          700: '#7d5c1c',
+        },
+      },
     },
   },
   plugins: [],
-}
+};

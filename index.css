@@ -2,7 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Scrollbar Hiding */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overscroll-behavior-y: none;
+  font-family: 'Cairo', system-ui, sans-serif;
+  background-color: #0a0805;
+  color: #f0e6d2;
+}
+
+.font-shaer {
+  font-family: 'Amiri', 'Times New Roman', serif;
+  line-height: 2.1;
+}
+
+.بيت {
+  font-family: 'Amiri', 'Times New Roman', serif;
+  line-height: 2.2;
+}
+
+/* نص ذهبي متدرّج للعناوين الكبيرة */
+.ذهبي {
+  background-image: linear-gradient(180deg, #f7e3a1 0%, #d3a94f 55%, #a47b28 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* خلفية نقش خفيف */
+.نقش {
+  background-image: radial-gradient(rgba(211, 169, 79, 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -11,6 +49,17 @@
   scrollbar-width: none;
 }
 
-body {
-  overscroll-behavior-y: none;
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .للطباعة {
+    color: #000 !important;
+    background: #fff !important;
+    border-color: #999 !important;
+  }
 }
